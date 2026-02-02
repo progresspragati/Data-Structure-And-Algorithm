@@ -16,11 +16,9 @@ class Solution:
             if node in old_new_node:
                 return old_new_node[node]
             new_node = Node(node.val)
-            print(f"node:{node.val}")
             old_new_node[node] = new_node
             for neighbor in node.neighbors:
                 new_node.neighbors.append(dfs(neighbor))
-                print(f"{node.val} neighbors: {neighbor.val}")
             return new_node
         
         return dfs(node) if node else None
@@ -46,6 +44,34 @@ class Solution:
             
         return old_new_node[node]
 
+    def cloneGraphUsingDFS(self, node: Optional['Node']) -> Optional['Node']:
+        old_to_new = {}
+        def dfs(node):
+            if node in old_to_new:
+                return old_to_new[node]
+            new_node = Node(node.val)
+            old_to_new[node] = new_node
+            for neighbor in node.neighbors:
+                new_node.neighbors.append(dfs(neighbor))
+            return new_node
+        return dfs(node) if node else None
+
+    def cloneGraphUsingBFS(self, node: Optional['Node']) -> Optional['Node']:
+        if not node:
+            return None
+        old_to_new = {}
+        old_to_new[node] = Node(node.val)
+        q = deque([node])
+        while q:
+            cur = q.popleft()
+            for neighbor in cur.neighbors:
+                if neighbor not in old_to_new:
+                    old_to_new[neighbor] = Node(neighbor.val)
+                    q.append(neighbor)
+                old_to_new[cur].neighbors.append(old_to_new[neighbor])
+        return old_to_new[node]
+
+
 
 result = Solution()
 node1 = Node(1)
@@ -54,4 +80,4 @@ node3 = Node(3)
 node1.neighbors = [node2]
 node2.neighbors = [node1,node3]
 node3.neighbors = [node2]
-result.cloneGraph(node1)
+result.cloneGraphUsingDFS(node1)
