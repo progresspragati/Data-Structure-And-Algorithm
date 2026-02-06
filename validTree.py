@@ -27,6 +27,28 @@ class Solution:
                 q.append((neighbor, node))
 
         return len(visit) == n
+    
+    def validTreeUsingDfs(self, n:int, edges: List[List[int]]) -> bool:
+        if len(edges) > n-1:
+            return False
+        adj_list = [[] for _ in range(n)]
+        for vertex1, vertex2 in edges:
+            adj_list[vertex1].append(vertex2)
+            adj_list[vertex2].append(vertex1)
+        visit = set()
+        def dfs(node, parent):
+            if node in visit:
+                    return False
+            visit.add(node)
+            for neighbor in adj_list[node]:
+                if neighbor ==  parent:
+                    continue
+                if not dfs(neighbor, node):
+                    return False
+            return True
+        return dfs(0, -1) and len(visit) == n
+                
+
 
 result = Solution()
-print(result.validTree(5, [[0, 1], [0, 2], [0, 3], [1, 4]]))
+print(result.validTreeUsingDfs(5, [[0, 1], [0, 2], [0, 3], [1, 4]]))
