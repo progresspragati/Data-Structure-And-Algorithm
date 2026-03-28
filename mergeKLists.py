@@ -1,4 +1,5 @@
 from typing import List, Optional
+import heapq
 
 class ListNode:
     def __init__(self, val=0, next=None):
@@ -7,34 +8,68 @@ class ListNode:
 
 class Solution:
     def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
-        nodes = []
-        for lst in lists:
-            while lst:
-                nodes.append(lst.val)
-                lst = lst.next
-        nodes.sort()
-
-        res = ListNode(0)
-        cur = res
-        for node in nodes:
-            cur.next = ListNode(node)
+        if len(lists) == 0:
+            return None
+        if len(lists) == 1:
+            return lists[0]
+        dummy = ListNode()
+        cur = dummy
+        while True:
+            min_node = -1
+            for i in range(len(lists)):
+                if not lists[i]:
+                    continue
+                if min_node == -1 or lists[min_node].val > lists[i].val:
+                    min_node = i
+            if min_node == -1:
+                break
+            cur.next = lists[min_node]
+            lists[min_node] = lists[min_node].next
             cur = cur.next
-        return res.next
+        return dummy.next
+    
+    def mergeKListsUsingHeap(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        if len(lists) == 0:
+            return None
+        if len(lists) == 1:
+            return lists[0]
+        heap = []
+        for i in range(len(lists)):
+            if lists[i]:
+                heapq.heappush(heap, (lists[i].val, i, lists[i]))
+        dummy = ListNode()
+        cur = dummy
+        while heap:
+            val, i, node = heapq.heappop(heap)
+
+            cur.next = node
+            cur = cur.next
+            if node.next:
+                heapq.heappush(heap, (node.next.val, i, node.next))
+        return dummy.next
     
 result = Solution()
-node1_3 = ListNode(4, None)
-node1_2 = ListNode(2, node1_3)
-node1_1 = ListNode(1, node1_2)
+nodeA = ListNode(1)
+nodeB = ListNode(2)
+nodeC = ListNode(4)
+nodeA.next = nodeB
+nodeB.next = nodeC
+nodeC.next = None
 
-node2_3 = ListNode(5, None)
-node2_2 = ListNode(3, node2_3)
-node2_1 = ListNode(1, node2_2)
+nodeA1 = ListNode(1)
+nodeB1 = ListNode(3)
+nodeC1 = ListNode(5)
+nodeA1.next = nodeB1
+nodeB1.next = nodeC1
+nodeC1.next = None
 
-node3_2 = ListNode(8, None)
-node3_1 = ListNode(7, node3_2)
+nodeA2 = ListNode(3)
+nodeB2 = ListNode(6)
+nodeA2.next = nodeB2
+nodeB2.next = None
 
-result.mergeKLists([node1_1, node2_1, node3_1])
-head = result.mergeKLists([node1_1, node2_1, node3_1])
+result = Solution()
+head = result.mergeKListsUsingHeap([nodeA, nodeA1, nodeA2])
 
 while head:
     print(head.val)
